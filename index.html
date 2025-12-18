@@ -658,7 +658,9 @@
 
   <div class="pager" id="pager">1 / 4</div>
   <div id="fade"></div>
-
+<audio id="bgm" loop preload="auto">
+  <source src="./music/bgm.mp3" type="audio/mpeg">
+</audio>
   <script>
     // ===== 1) 翻頁：滾輪一次切換一頁（絲滑 + 淡出淡入）=====
     const container = document.getElementById("snap");
@@ -824,6 +826,38 @@
     syncIndexFromScroll();
     updateActivePage();
     updateParallax();
+    // ===== 3) 作法二：第一次操作自動播放背景音樂（無按鈕版）=====
+let started = false;
+const bgm = document.getElementById("bgm");
+
+// 保守處理：避免有些瀏覽器沒抓到 audio
+function fadeInAudio(audio, duration = 1200){
+  if (!audio) return;
+  audio.volume = 0;
+
+  const p = audio.play();
+  if (p && typeof p.catch === "function") {
+    p.catch(() => {}); // 避免 console 噴錯（仍需使用者動作才會成功播放）
+  }
+
+  const step = 0.02;
+  const interval = duration / (1 / step);
+  const timer = setInterval(() => {
+    audio.volume = Math.min(1, audio.volume + step);
+    if (audio.volume >= 1) clearInterval(timer);
+  }, interval);
+}
+
+function startMusicOnce(){
+  if (started) return;
+  fadeInAudio(bgm);
+  started = true;
+}
+
+// 用 pointerdown 比 click 更穩（不影響你錨點翻頁 click）
+document.addEventListener("pointerdown", startMusicOnce, { once:true });
+document.addEventListener("wheel", startMusicOnce, { once:true });
   </script>
+  
 </body>
 </html>
