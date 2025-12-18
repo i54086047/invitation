@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title
+    data-i18n-zh="Chun-Wei & Yerim｜婚禮喜帖"
+    data-i18n-ko="Chun-Wei & Yerim｜결혼식 초대장"
+    data-i18n-en="Chun-Wei & Yerim｜Wedding Invitation">
+    Chun-Wei & Yerim｜결혼식 초대장
+  </title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent:#c9a27d;
+      --accent-dark:#a07c56;
+      --text:#ffffff;
+      --text-dim: rgba(255,255,255,0.82);
+      --card: rgba(255,255,255,0.12);
+      --card-border: rgba(255,255,255,0.20);
+      --shadow: 0 10px 30px rgba(0,0,0,0.25);
+      --radius: 22px;
+      --transition: all .25s ease;
+    }
+
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    html, body{ height:100%; }
+
+    body{
+      font-family:"Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      background:#000;
+    }
+
+    header{
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 80;
+      padding: 12px 14px;
+      pointer-events: none;
+    }
+
+    .topbar{
+      pointer-events: auto;
+      width: min(980px, calc(100% - 8px));
+      margin: 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      padding-left: 6px;
+      user-select:none;
+    }
+
+    .brand-title{
+      font-family:"Playfair Display", serif;
+      letter-spacing: .12em;
+      font-size: 12px;
+      color: rgba(255,255,255,0.92);
+      text-transform: uppercase;
+    }
+
+    .brand-sub{
+      font-size: 11px;
+      color: rgba(255,255,255,0.72);
+    }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+
+    .lang-toggle{
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 2px;
+      display:flex;
+      gap: 2px;
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(10px);
+    }
+
+    .lang-btn{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      transition: var(--transition);
+    }
+
+    .lang-btn:hover{ color: rgba(255,255,255,0.95); }
+    .lang-btn.active{
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding: 9px 14px;
+      font-size: 12px;
+      transition: var(--transition);
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:#fff;
+      user-select:none;
+      white-space: nowrap;
+    }
+
+    .btn-primary{
+      background: var(--accent);
+      box-shadow: var(--shadow);
+    }
+    .btn-primary:hover{ background: var(--accent-dark); transform: translateY(-1px); }
+
+    .btn-ghost{
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .btn-ghost:hover{ border-color: rgba(255,255,255,0.35); transform: translateY(-1px); }
+
+    /* 全屏分頁容器 */
+    .snap-container{
+      height: 100vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+    }
+
+    section.page{
+      height: 100vh;
+      position: relative;
+      scroll-snap-align: start;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 84px 16px 24px;
+      color: var(--text);
+      background: center/cover no-repeat;
+      background-image: var(--bg);
+
+      /* 背景 zoom / parallax 會用到的 transform */
+      transform: translate3d(0,0,0);
+      will-change: transform, filter;
+      transition: transform 680ms ease, filter 680ms ease;
+    }
+
+    /* 背景遮罩 */
+    section.page::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0.34)),
+        radial-gradient(circle at 20% 10%, rgba(0,0,0,0.20), rgba(0,0,0,0.62));
+      pointer-events:none;
+    }
+
+    .content{
+      position: relative;
+      width: min(920px, 100%);
+      display:grid;
+      gap: 14px;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 18px 18px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title{
+      font-family:"Playfair Display", serif;
+      letter-spacing:.06em;
+      font-size: 30px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .subtitle{
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .row{
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--text-dim);
+      display:grid;
+      gap: 8px;
+    }
+
+    .label{ color: rgba(255,255,255,0.92); font-weight: 500; }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 14px;
+      align-items:center;
+    }
+
+    .hint{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .timeline{
+      display:grid;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .timeline-item{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+    }
+
+    .time{
+      min-width: 62px;
+      color: rgba(255,255,255,0.92);
+      font-weight: 600;
+    }
+
+    .small{
+      font-size: 12px;
+      color: rgba(255,255,255,0.72);
+      margin-top: 8px;
+    }
+
+    .pager{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 90;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: rgba(255,255,255,0.85);
+      font-size: 12px;
+      user-select:none;
+    }
+
+    /* 翻頁淡出淡入遮罩 */
+    #fade{
+  position: fixed;
+  inset: -2px;
+  background: rgba(240,240,240,0.96);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 200;
+  transition: opacity 660ms cubic-bezier(.4,0,.2,1);
+}
+#fade.on{ opacity: 1; }
+
+
+    /* ===== 進階特效 1：卡片 reveal（上浮 + blur → 清晰）===== */
+    .reveal{
+      opacity: 0;
+      transform: translateY(10px) scale(0.995);
+      filter: blur(8px);
+      transition: opacity 520ms ease, transform 520ms ease, filter 520ms ease;
+      will-change: opacity, transform, filter;
+    }
+    .reveal.show{
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    /* ===== 進階特效 2：背景 zoom/parallax（active page 輕微放大更有電影感）===== */
+    section.page.active{
+      filter: saturate(1.02) contrast(1.02);
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      section.page, .reveal, #fade{ transition: none !important; }
+    }
+
+    @media (max-width: 520px){
+      .title{ font-size: 26px; }
+      .card{ padding: 16px; }
+      .btn{ padding: 9px 12px; }
+      .brand-sub{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-title">C &amp; Y Wedding</div>
+        <div class="brand-sub"
+          data-i18n-ko="마우스 휠로 한 페이지씩 이동"
+          data-i18n-zh="滑鼠滾輪一次切換一頁"
+          data-i18n-en="One wheel scroll = one smooth page">
+          마우스 휠로 한 페이지씩 이동
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="ko">한</button>
+          <button class="lang-btn" data-lang="zh">中</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+        <a class="btn btn-primary" href="#rsvp"
+          data-i18n-ko="RSVP 참석"
+          data-i18n-zh="我要出席 RSVP"
+          data-i18n-en="RSVP">
+          RSVP 참석
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="snap-container" id="snap">
+
+    <!-- PAGE 1: COVER -->
+    <section class="page" id="cover" style="--bg:url('./photos/01-cover.jpg');">
+      <div class="content">
+        <div class="card reveal">
+          <div class="title">Chun-Wei &amp; Yerim</div>
+
+          <div class="subtitle"
+            data-i18n-ko="저희 두 사람이 새로운 길을 걷는 순간을 함께 해 주세요."
+            data-i18n-zh="誠摯邀請您，一起見證我們步入新的旅程。"
+            data-i18n-en="We warmly invite you to celebrate this new journey with us.">
+            저희 두 사람이 새로운 길을 걷는 순간을 함께 해 주세요.
+          </div>
+
+          <div class="row">
+            <div>
+              <span class="label"
+                data-i18n-ko="날짜: "
+                data-i18n-zh="日期："
+                data-i18n-en="Date: ">
+                날짜:
+              </span>
+              <span>2027 / 01 / 16 (Sat)</span>
+            </div>
+
+            <div>
+              <span class="label"
+                data-i18n-ko="시간: "
+                data-i18n-zh="時間："
+                data-i18n-en="Time: ">
+                시간:
+              </span>
+              <span
+                data-i18n-ko="입장 18:00, 예식 18:30"
+                data-i18n-zh="入場 18:00，儀式 18:30"
+                data-i18n-en="Doors 18:00, Ceremony 18:30">
+                입장 18:00, 예식 18:30
+              </span>
+            </div>
+
+            <div>
+              <span class="label"
+                data-i18n-ko="장소: "
+                data-i18n-zh="地點："
+                data-i18n-en="Venue: ">
+                장소:
+              </span>
+              <span
+                data-i18n-ko="그랜드 하얏트 서울"
+                data-i18n-zh="首爾君悅酒店"
+                data-i18n-en="Grand Hyatt Seoul">
+                그랜드 하얏트 서울
+              </span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary" href="#details"
+              data-i18n-ko="예식 안내 보기"
+              data-i18n-zh="查看婚禮資訊"
+              data-i18n-en="View Details">
+              예식 안내 보기
+            </a>
+            <a class="btn btn-ghost" href="#story"
+              data-i18n-ko="우리의 이야기"
+              data-i18n-zh="我們的故事"
+              data-i18n-en="Our Story">
+              우리의 이야기
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 2: STORY -->
+    <section class="page" id="story" style="--bg:url('./photos/02-story.jpg');">
+      <div class="content">
+        <div class="card reveal">
+          <div class="title"
+            data-i18n-ko="우리의 이야기"
+            data-i18n-zh="Our Story"
+            data-i18n-en="Our Story">
+            우리의 이야기
+          </div>
+
+          <div class="subtitle"
+            data-i18n-ko="타이난과 서울을 오가던 우리의 일상이 쌓여 오늘의 우리가 되었습니다."
+            data-i18n-zh="跨越台南與首爾的日常，慢慢疊起來，就變成了今天的我們。"
+            data-i18n-en="Across Tainan and Seoul, our everyday moments piled up—until they became us.">
+            타이난과 서울을 오가던 우리의 일상이 쌓여 오늘의 우리가 되었습니다.
+          </div>
+
+          <div class="row">
+            <div
+              data-i18n-ko="한 통의 메시지, 한 장의 비행기 표에서 시작된 인연. 서로 다른 도시에 살면서도, 다음 만남을 기다리며 언제나 서로를 위한 자리를 남겨두었습니다."
+              data-i18n-zh="從一通訊息、一張機票開始，我們學會在不同的城市裡替彼此保留一個位置，期待著下一次重逢。"
+              data-i18n-en="It started with a message and a plane ticket. Even in different cities, we always saved a place for each other—and for our next reunion.">
+              한 통의 메시지, 한 장의 비행기 표에서 시작된 인연. 서로 다른 도시에 살면서도, 다음 만남을 기다리며 언제나 서로를 위한 자리를 남겨두었습니다.
+            </div>
+
+            <div
+              data-i18n-ko="이제 저희는 이 특별한 날에 여러분을 초대하여, 두 사람의 여정을 하나의 '집'으로 완성하는 순간을 함께 나누고 싶습니다."
+              data-i18n-zh="現在，我們想邀請你／妳，一起來到這一天，見證我們把這段旅程，變成同一個「家」。"
+              data-i18n-en="Now, we invite you to be with us on this day—to witness our journey becoming one home.">
+              이제 저희는 이 특별한 날에 여러분을 초대하여, 두 사람의 여정을 하나의 '집'으로 완성하는 순간을 함께 나누고 싶습니다.
+            </div>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary" href="#details"
+              data-i18n-ko="다음: 예식 안내"
+              data-i18n-zh="下一頁：婚禮資訊"
+              data-i18n-en="Next: Details">
+              다음: 예식 안내
+            </a>
+            <a class="btn btn-ghost" href="#cover"
+              data-i18n-ko="표지로"
+              data-i18n-zh="回到封面"
+              data-i18n-en="Back to Cover">
+              표지로
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 3: DETAILS -->
+    <section class="page" id="details" style="--bg:url('./photos/03-details.jpg');">
+      <div class="content">
+        <div class="card reveal">
+          <div class="title"
+            data-i18n-ko="웨딩 데이 안내"
+            data-i18n-zh="Wedding Day"
+            data-i18n-en="Wedding Day">
+            웨딩 데이 안내
+          </div>
+
+          <div class="subtitle"
+            data-i18n-ko="예식 일정과 장소 안내"
+            data-i18n-zh="當天流程與場地資訊"
+            data-i18n-en="Schedule & venue information">
+            예식 일정과 장소 안내
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="time">18:00</div>
+              <div
+                data-i18n-ko="하객 입장 및 간단한 사진 촬영"
+                data-i18n-zh="賓客入場、簡單合照"
+                data-i18n-en="Guest arrival & quick photos">
+                하객 입장 및 간단한 사진 촬영
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="time">18:30</div>
+              <div
+                data-i18n-ko="본식(예식) 시작"
+                data-i18n-zh="證婚儀式開始"
+                data-i18n-en="Ceremony begins">
+                본식(예식) 시작
+              </div>
+            </div>
+
+            <div class="timeline-item">
+              <div class="time">19:30</div>
+              <div
+                data-i18n-ko="연회 및 축하 시간"
+                data-i18n-zh="晚宴、致詞與互動時間"
+                data-i18n-en="Reception, toasts & celebration">
+                연회 및 축하 시간
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:14px;">
+            <div>
+              <span class="label"
+                data-i18n-ko="장소: "
+                data-i18n-zh="場地："
+                data-i18n-en="Venue: ">
+                장소:
+              </span>
+              <span
+                data-i18n-ko="그랜드 하얏트 서울"
+                data-i18n-zh="首爾君悅酒店"
+                data-i18n-en="Grand Hyatt Seoul">
+                그랜드 하얏트 서울
+              </span>
+            </div>
+
+            <div>
+              <span class="label"
+                data-i18n-ko="주소: "
+                data-i18n-zh="地址："
+                data-i18n-en="Address: ">
+                주소:
+              </span>
+              <span
+                data-i18n-ko="서울특별시 용산구 소월로 322 (한남동) 04347"
+                data-i18n-zh="韓國 首爾特別市 龍山區 蘇月路 322號（漢南洞）04347"
+                data-i18n-en="322 Sowol-ro, Yongsan-gu, Seoul 04347, South Korea">
+                서울특별시 용산구 소월로 322 (한남동) 04347
+              </span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary"
+              href="https://www.google.com/maps/search/?api=1&query=Grand%20Hyatt%20Seoul"
+              target="_blank"
+              data-i18n-ko="구글 지도에서 열기"
+              data-i18n-zh="在 Google 地圖中開啟"
+              data-i18n-en="Open in Google Maps">
+              구글 지도에서 열기
+            </a>
+            <a class="btn btn-ghost" href="#rsvp"
+              data-i18n-ko="다음: RSVP"
+              data-i18n-zh="下一頁：RSVP"
+              data-i18n-en="Next: RSVP">
+              다음: RSVP
+            </a>
+          </div>
+
+          <div class="small"
+            data-i18n-ko="＊원하시면 구글 지도(iframe)도 페이지에 넣어드릴 수 있어요."
+            data-i18n-zh="＊如果你要內嵌 Google Map，我也可以幫你把 iframe 版加進來。"
+            data-i18n-en="*If you want an embedded map (iframe), you can add it here.">
+            ＊원하시면 구글 지도(iframe)도 페이지에 넣어드릴 수 있어요.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 4: RSVP -->
+    <section class="page" id="rsvp" style="--bg:url('./photos/04-rsvp.jpg');">
+      <div class="content">
+        <div class="card reveal">
+          <div class="title"
+            data-i18n-ko="RSVP 참석 여부"
+            data-i18n-zh="RSVP 出席回覆"
+            data-i18n-en="RSVP">
+            RSVP 참석 여부
+          </div>
+
+          <div class="subtitle"
+            data-i18n-ko="좌석과 식사를 잘 준비할 수 있도록, 참석 여부를 간단히 알려주세요."
+            data-i18n-zh="為了讓我們能好好準備座位與餐點，請花一點時間填寫出席回覆。"
+            data-i18n-en="To help us prepare seats and meals, please take a moment to RSVP.">
+            좌석과 식사를 잘 준비할 수 있도록, 참석 여부를 간단히 알려주세요.
+          </div>
+
+          <div class="row">
+            <div
+              data-i18n-ko="1) 아래 버튼을 눌러 참석 여부 작성 폼(예: 구글 설문지)으로 이동해 주세요."
+              data-i18n-zh="1) 點擊下方按鈕前往回覆表單（建議使用 Google 表單）。"
+              data-i18n-en="1) Click the button below to open the RSVP form (Google Forms recommended).">
+              1) 아래 버튼을 눌러 참석 여부 작성 폼(예: 구글 설문지)으로 이동해 주세요.
+            </div>
+
+            <div
+              data-i18n-ko="2) 성함, 동반 인원, 식사 관련 요청 사항 등을 작성해 주세요."
+              data-i18n-zh="2) 填寫您的姓名、人數與飲食需求。"
+              data-i18n-en="2) Fill in your name, number of guests, and dietary needs.">
+              2) 성함, 동반 인원, 식사 관련 요청 사항 등을 작성해 주세요.
+            </div>
+
+            <div
+              data-i18n-ko="3) 제출 후 예식 전에 다시 한 번 안내드리겠습니다."
+              data-i18n-zh="3) 送出後，我們會在婚禮前再與您確認。"
+              data-i18n-en="3) After submitting, we may confirm again before the wedding day.">
+              3) 제출 후 예식 전에 다시 한 번 안내드리겠습니다.
+            </div>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary" href="https://docs.google.com/forms" target="_blank"
+              data-i18n-ko="RSVP 폼으로 이동"
+              data-i18n-zh="前往 RSVP 表單"
+              data-i18n-en="Open RSVP Form">
+              RSVP 폼으로 이동
+            </a>
+
+            <a class="btn btn-ghost" href="#cover"
+              data-i18n-ko="표지로"
+              data-i18n-zh="回到封面"
+              data-i18n-en="Back to Cover">
+              표지로
+            </a>
+          </div>
+
+          <div class="hint"
+            data-i18n-ko="＊설문지 사용이 어려우시면, 초대장을 보낸 연락처로 직접 알려주셔도 됩니다."
+            data-i18n-zh="＊若無法使用表單，也可以直接回覆這封電子喜帖的寄件人。"
+            data-i18n-en="*If you can't use the form, you can reply directly to the sender.">
+            ＊설문지 사용이 어려우시면, 초대장을 보낸 연락처로 직접 알려주셔도 됩니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="pager" id="pager">1 / 4</div>
+  <div id="fade"></div>
+
+  <script>
+    // ===== 1) 翻頁：滾輪一次切換一頁（絲滑 + 淡出淡入）=====
+    const container = document.getElementById("snap");
+    const pages = Array.from(container.querySelectorAll("section.page"));
+    const pager = document.getElementById("pager");
+    const fade = document.getElementById("fade");
+    const revealCards = Array.from(document.querySelectorAll(".reveal"));
+
+    let currentIndex = 0;
+    let locked = false;
+
+    function syncIndexFromScroll() {
+      const h = window.innerHeight;
+      const idx = Math.round(container.scrollTop / h);
+      currentIndex = Math.max(0, Math.min(pages.length - 1, idx));
+      pager.textContent = `${currentIndex + 1} / ${pages.length}`;
+      updateActivePage();
+    }
+
+    // active page：背景微放大 + 卡片浮出
+    function updateActivePage() {
+      pages.forEach((p, i) => p.classList.toggle("active", i === currentIndex));
+
+      // reveal only the current page's card(s)
+      revealCards.forEach(card => card.classList.remove("show"));
+      const active = pages[currentIndex].querySelectorAll(".reveal");
+      active.forEach(el => {
+        // 下一幀再加 show，讓 transition 一定觸發
+        requestAnimationFrame(() => el.classList.add("show"));
+      });
+    }
+
+    // 背景 parallax：依 scrollTop 做小位移（很輕微，不會暈）
+    function updateParallax() {
+      const h = window.innerHeight;
+      const y = container.scrollTop;
+      const idx = Math.round(y / h);
+
+      pages.forEach((page, i) => {
+        const pageTop = i * h;
+        const progress = (y - pageTop) / h; // -1 ~ 1 附近
+        const clamped = Math.max(-1, Math.min(1, progress));
+        const translate = clamped * 10;   // px
+        const scale = 1.04 - Math.min(0.02, Math.abs(clamped) * 0.02); // 1.02~1.04
+        page.style.transform = `translate3d(0, ${translate}px, 0) scale(${scale})`;
+      });
+
+      // 讓 index 同步（避免拖滾動條時 active 沒更新）
+      currentIndex = Math.max(0, Math.min(pages.length - 1, idx));
+      pager.textContent = `${currentIndex + 1} / ${pages.length}`;
+      updateActivePage();
+    }
+
+    function transitionTo(index) {
+      const next = Math.max(0, Math.min(pages.length - 1, index));
+      if (next === currentIndex) return;
+
+      fade.classList.add("on");
+
+      setTimeout(() => {
+        currentIndex = next;
+        pages[currentIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+        pager.textContent = `${currentIndex + 1} / ${pages.length}`;
+        updateActivePage();
+
+        setTimeout(() => fade.classList.remove("on"), 620);
+      }, 460);
+    }
+
+    function goTo(index) {
+      transitionTo(index);
+    }
+
+    // scroll：同步頁碼 + parallax
+    let rafPending = false;
+    container.addEventListener("scroll", () => {
+      if (rafPending) return;
+      rafPending = true;
+      requestAnimationFrame(() => {
+        rafPending = false;
+        updateParallax();
+      });
+    }, { passive: true });
+
+    container.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      if (locked) return;
+      locked = true;
+
+      const delta = e.deltaY;
+      if (delta > 0) goTo(currentIndex + 1);
+      else if (delta < 0) goTo(currentIndex - 1);
+
+      setTimeout(() => { locked = false; }, 650);
+    }, { passive: false });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown" || e.key === "PageDown") goTo(currentIndex + 1);
+      if (e.key === "ArrowUp" || e.key === "PageUp") goTo(currentIndex - 1);
+      if (e.key === "Home") goTo(0);
+      if (e.key === "End") goTo(pages.length - 1);
+    });
+
+    // 點錨點也走淡出淡入
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href^='#']");
+      if (!a) return;
+
+      const id = a.getAttribute("href");
+      const target = document.querySelector(id);
+      if (!target) return;
+
+      e.preventDefault();
+      const idx = pages.indexOf(target);
+      if (idx >= 0) transitionTo(idx);
+    });
+
+    // ===== 2) 三語切換：優先順序 韓 > 中 > 英 =====
+    const langButtons = document.querySelectorAll(".lang-btn");
+    const supportedLangs = ["ko", "zh", "en"];
+    const defaultLang = "ko";
+
+    function getI18nText(el, lang) {
+      const order = (lang === "ko") ? ["ko","zh","en"]
+                  : (lang === "zh") ? ["zh","ko","en"]
+                  : ["en","ko","zh"];
+
+      for (const l of order) {
+        const t = el.getAttribute(`data-i18n-${l}`);
+        if (t != null && t.trim() !== "") return t;
+      }
+      return null;
+    }
+
+    function applyLang(lang) {
+      if (!supportedLangs.includes(lang)) lang = defaultLang;
+
+      langButtons.forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.lang === lang);
+      });
+
+      const nodes = document.querySelectorAll("[data-i18n-zh],[data-i18n-ko],[data-i18n-en]");
+      nodes.forEach(el => {
+        const t = getI18nText(el, lang);
+        if (t != null) el.textContent = t;
+      });
+
+      const titleEl = document.querySelector("title[data-i18n-zh],title[data-i18n-ko],title[data-i18n-en]");
+      if (titleEl) {
+        const tt = getI18nText(titleEl, lang);
+        if (tt) document.title = tt;
+      }
+
+      document.documentElement.lang = (lang === "zh") ? "zh-Hant" : lang;
+    }
+
+    langButtons.forEach(btn => {
+      btn.addEventListener("click", () => applyLang(btn.dataset.lang));
+    });
+
+    // 初始
+    applyLang(defaultLang);
+    syncIndexFromScroll();
+    updateActivePage();
+    updateParallax();
+  </script>
+</body>
+</html>
